@@ -1,8 +1,9 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Link, RouterProvider } from "react-router-dom";
 import ProjectList from "./components/ProjectList";
 import ProjectDetail from "./components/ProjectDetail";
 import CreateProject from "./components/CreateProject";
 import noProjectImg from "./assets/no-projects.png";
+import { useState, useEffect } from "react";
 
 const router = createBrowserRouter([
   {
@@ -20,8 +21,33 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  let [projects, setProjects] = useState([{ name: "test" }]);
+
+  useEffect(() => {
+    async function getProjects() {
+      const res = await fetch("http://localhost:3200/projects", {
+        method: "GET", // *GET, POST, PUT, DELETE, etc.
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "same-origin", // include, *same-origin, omit
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: "follow", // manual, *follow, error
+        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      });
+      projects = await res.json();
+      setProjects(projects.projects);
+      console.log(projects);
+    }
+    getProjects();
+    //Runs only on the first render
+  }, []);
+
+  const listItems = projects.map((d) => <li key={d.name}>{d.name}</li>);
+
   const addProject = () => {
-    // history.push("/foo");
     router.navigate("/create");
   };
   return (
@@ -36,14 +62,12 @@ function App() {
             Add Project
           </button>
           <ul>
-            <li>Project</li>
-            <li>Project</li>
-            <li>Project</li>
-            <li>Project</li>
+            <Link to="test">"test"</Link>
+
+            {listItems}
           </ul>
         </div>
         <div>
-          {/* <img id="no-project-img" src={noProjectImg} alt="" /> */}
           <RouterProvider router={router} />
         </div>
       </div>
