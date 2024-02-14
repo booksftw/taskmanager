@@ -11,7 +11,7 @@ const router = createBrowserRouter([
     element: <ProjectList />,
   },
   {
-    path: "/detail",
+    path: "/:projectId",
     element: <ProjectDetail />,
   },
   {
@@ -45,7 +45,11 @@ function App() {
     //Runs only on the first render
   }, []);
 
-  const listItems = projects.map((d) => <li key={d.name}>{d.name}</li>);
+  const listItems = projects.map((d) => (
+    <li key={d.name}>
+      <a href={d.id}>{d.name}</a>
+    </li>
+  ));
 
   const addProject = () => {
     router.navigate("/create");
@@ -61,11 +65,7 @@ function App() {
           >
             Add Project
           </button>
-          <ul>
-            <Link to="test">"test"</Link>
-
-            {listItems}
-          </ul>
+          <ul>{listItems}</ul>
         </div>
         <div>
           <RouterProvider router={router} />
