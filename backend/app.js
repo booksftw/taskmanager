@@ -1,24 +1,22 @@
-import fs from 'node:fs/promises';
+import fs from "node:fs/promises";
 
-import bodyParser from 'body-parser';
-import express from 'express';
+import bodyParser from "body-parser";
+import express from "express";
 
 const app = express();
 
-app.use(express.static('images'));
+app.use(express.static("images"));
 app.use(bodyParser.json());
 
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 
-// CORS
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*'); // allow all domains
-    res.setHeader('Access-Control-Allow-Methods', 'GET, PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    next();
+  res.setHeader("Access-Control-Allow-Origin", "*"); // allow all domains
+  res.setHeader("Access-Control-Allow-Methods", "GET, PUT, POST");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  next();
 });
-//
+
 // app.get('/login', async (req, res) => {
 //     let token;
 //     try {
@@ -37,39 +35,72 @@ app.use((req, res, next) => {
 //     res.status(200).json({message: 'authenticated', token: token})
 // })
 
-app.get('/projects', async (req, res) => {
-    console.log("get projects")
-    const fileContent = await fs.readFile('./data/projects.json');
+// app.get(
+//   ("/test",
+//   async (req, res) => {
+//     res.status(200).json({ message: "you did it test success." });
+//   })
+// );
 
-    const projectsData = JSON.parse(fileContent);
-
-    res.status(200).json({projects: projectsData});
+app.post("/test", async (req, res) => {
+  res.status(200).json({ message: "test successful" });
 });
 
-app.post('/project', async (req, res) => {
-    console.log("add project")
-    const data = req.body;
-    if (JSON.stringify(data) === '{}') {
-        console.log("invalid input data")
-        res.status(500).json({message: 'empty payload'})
-    } else {
-        console.log(data)
-        const fileContent = await fs.readFile('./data/projects.json');
-        const projectsData = JSON.parse(fileContent);
-        data.id = Math.random().toString(36).replace('.', '');
-        projectsData.push({...data});
-        await fs.writeFile('./data/projects.json', JSON.stringify(projectsData));
-        res.status(200).json({message: 'project saved.'});
-    }
+app.get("/projects", async (req, res) => {
+  console.log("get projects");
+  const fileContent = await fs.readFile("./data/projects.json");
+
+  const projectsData = JSON.parse(fileContent);
+
+  res.status(200).json({ projects: projectsData });
+});
+
+app.post("/project", async (req, res) => {
+  console.log("add project");
+  const data = req.body;
+  if (JSON.stringify(data) === "{}") {
+    console.log("invalid input data");
+    res.status(500).json({ message: "empty payload" });
+  } else {
+    console.log(data);
+    const fileContent = await fs.readFile("./data/projects.json");
+    const projectsData = JSON.parse(fileContent);
+    data.id = Math.random().toString(36).replace(".", "");
+    projectsData.push({ ...data });
+    await fs.writeFile("./data/projects.json", JSON.stringify(projectsData));
+    res.status(200).json({ message: "project saved." });
+  }
+});
+
+app.post("/deleteProject", async (req, res) => {
+  const data = req.body;
+  const id = req.body.id;
+  console.log(req.body, "@_@");
+  if (JSON.stringify(data) === "{}") {
+    console.log("invalid input data");
+    res.status(500).json({ message: "empty payload" });
+  } else {
+    console.log(data);
+    const fileContent = await fs.readFile("./data/projects.json");
+    const projectsData = JSON.parse(fileContent);
+    console.log(projectsData, "projectsData");
+    const updatedData = projectsData.filter((el) => {
+      return el.id !== id;
+    });
+    // projectsData.push({...data});
+
+    await fs.writeFile("./data/projects.json", JSON.stringify(updatedData));
+    res.status(200).json({ message: "project deleted." });
+  }
 });
 
 // 404
 app.use((req, res, next) => {
-    if (req.method === 'OPTIONS') {
-        return next();
-    }
-    res.status(404).json({message: '404 - Not Found'});
+  if (req.method === "OPTIONS") {
+    return next();
+  }
+  res.status(404).json({ message: "404 - Not Found" });
 });
 
-console.log("listening to port 3200")
+console.log("listening to port 3200");
 app.listen(3200);

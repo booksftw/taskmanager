@@ -1,34 +1,7 @@
-import { createBrowserRouter, Link, RouterProvider } from "react-router-dom";
-import ProjectList from "./components/ProjectList";
-import ProjectDetail from "./components/ProjectDetail";
-import CreateProject from "./components/CreateProject";
-import noProjectImg from "./assets/no-projects.png";
-import { useState, useEffect, createContext } from "react";
-import { ProjectContext } from "./store/ProjectContext";
-import IndexPage from "./components/IndexPage";
+import React from "react";
+import { Outlet } from "react-router-dom";
 
-const router = createBrowserRouter([
-  {
-    path: "",
-    element: <IndexPage />,
-    children: [
-      {
-        path: "/",
-        element: <ProjectList />,
-      },
-      {
-        path: ":projectId",
-        element: <ProjectDetail />,
-      },
-      {
-        path: "create",
-        element: <CreateProject />,
-      },
-    ],
-  },
-]);
-
-function App() {
+export default function IndexPage() {
   let [projects, setProjects] = useState([{ name: "test" }]);
 
   useEffect(() => {
@@ -75,6 +48,7 @@ function App() {
   };
   return (
     <>
+      <h1>Howdy Indexpage</h1>
       <ProjectContext.Provider value={ProjectContextValue}>
         <div id="wrapper">
           <div id="sidebar">
@@ -88,12 +62,10 @@ function App() {
             <ul>{listItems}</ul>
           </div>
           <div>
-            <RouterProvider router={router} />
+            <Outlet></Outlet>
           </div>
         </div>
       </ProjectContext.Provider>
     </>
   );
 }
-
-export default App;
